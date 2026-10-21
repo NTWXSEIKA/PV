@@ -442,50 +442,19 @@ local function equipBestFarmingPets(isCurrent)
 
     local pets = getOwnedConfiguredPets()
     local selected = {}
-    local equipped = {}
     local equippedCount = 0
     local currentRepSpeed = 0
 
-    table.sort(pets, function(a, b)
-        return a.repSpeed > b.repSpeed
-    end)
-
     for _, pet in ipairs(pets) do
-        if equippedCount >= MAX_PET_SLOTS or currentRepSpeed >= TARGET_REP_SPEED then
-            break
-        end
-
-        if pet.repSpeed > 0 then
-            table.insert(selected, pet.instance)
-            equipped[pet.instance] = true
-            equippedCount = equippedCount + 1
-            currentRepSpeed = currentRepSpeed + pet.repSpeed
-        end
-    end
-
-    local remainingPets = {}
-
-    for _, pet in ipairs(pets) do
-        if not equipped[pet.instance] then
-            table.insert(remainingPets, pet)
-        end
-    end
-
-    table.sort(remainingPets, function(a, b)
-        local scoreA = a.strength + a.durability
-        local scoreB = b.strength + b.durability
-        return scoreA > scoreB
-    end)
-
-    for _, pet in ipairs(remainingPets) do
+        if isCurrent and not isCurrent() then return end
         if equippedCount >= MAX_PET_SLOTS then
             break
         end
 
-        if pet.strength > 0 or pet.durability > 0 then
+        if pet.name == "Swift Samurai" then
             table.insert(selected, pet.instance)
-            equipped[pet.instance] = true
             equippedCount = equippedCount + 1
+            currentRepSpeed = currentRepSpeed + (pet.repSpeed or 0)
         end
     end
 
@@ -542,10 +511,10 @@ tabs.rebirths.generation = 0
 tabs.rebirths.adaptive = {
     TargetSeconds = 3,
     MinRate = 3,
-    MaxRate = 50,
-    SendRate = 10,
-    ProbeRate = 10,
-    ProbeReps = 10,
+    MaxRate = 60,
+    SendRate = 15,
+    ProbeRate = 15,
+    ProbeReps = 15,
     FeedbackTimeout = 1,
     StrengthPerRep = nil,
     LastTrainingSeconds = nil
@@ -2589,8 +2558,22 @@ tabs.other:AddSwitch("สควอตฮาโลวีน", function(state)
     tabs.other.tpE(Vector3.new(4803.357, 83.791, 5827.032))
 end)
 
-tabs.other:AddButton("สวมใส่สัตว์เลี้ยงเพิ่มจำนวนครั้ง", function()
-    equipBestFarmingPets()
+tabs.other:AddButton("ใส่มังกรทุกตัวที่มี", function()
+    local selected = {}
+    local count = 0
+
+    for _, folder in ipairs(lp.player.petsFolder:GetChildren()) do
+        if folder:IsA("Folder") then
+            for _, pet in ipairs(folder:GetChildren()) do
+                if pet.Name == "Inferno Drake" and count < MAX_PET_SLOTS then
+                    table.insert(selected, pet)
+                    count = count + 1
+                end
+            end
+        end
+    end
+
+    applyPetLoadout(selected)
 end)
 
 tabs.other:AddHeading("การเชื่อมต่อใหม่:")
