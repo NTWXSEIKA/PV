@@ -7086,10 +7086,14 @@ local function RunEmbeddedScript(source, scriptName)
     return true
 end
 
+--// WHITELIST
+--// =========================================================
+
 local WhitelistURL =
     "https://raw.githubusercontent.com/NTWXSEIKA/WHITELIST/refs/heads/main/whitelist.txt"
 
 local userAccess = "NONE"
+
 
 local function GetNetworkTime()
 
@@ -7122,6 +7126,7 @@ local function GetNetworkTime()
 
 end
 
+
 local function CheckAccess()
 
     local success, result =
@@ -7133,15 +7138,18 @@ local function CheckAccess()
 
         end)
 
+
     if success then
 
         local currentTime =
             GetNetworkTime()
 
+
         for line in result:gmatch("[^\r\n]+") do
 
             local data =
                 line:split("|")
+
 
             if #data >= 3 then
 
@@ -7156,6 +7164,7 @@ local function CheckAccess()
 
                 local role =
                     data[3]:gsub("%s+", ""):upper()
+
 
                 if Player.Name == name then
 
@@ -7180,12 +7189,15 @@ local function CheckAccess()
 
     end
 
+
     return false, "NO_ACCESS"
 
 end
 
+
 local isAuthorized, status =
     CheckAccess()
+
 
 if not isAuthorized then
 
@@ -7204,6 +7216,8 @@ if not isAuthorized then
 
 end
 
+
+--// =========================================================
 local oldUI =
     CoreGui:FindFirstChild(
         "KDL_LUXURY_METAL"
